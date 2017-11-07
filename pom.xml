@@ -1,0 +1,676 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<!-- POM的模型版本 -->
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.8.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>com.github.vindell</groupId>
+	<artifactId>spring-boot-deployment</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:git@github.com:vindell/${project.artifactId}.git</connection>
+		<developerConnection>scm:git:git@github.com:vindell/${project.artifactId}.git</developerConnection>
+		<url>git@github.com:vindell/${project.artifactId}.git</url>
+	</scm>
+	
+	<developers>
+        <developer>
+        	<id>001</id>
+            <name>vindell</name>
+            <email>hnxyhcwdl1003@163.com</email>
+        </developer>
+    </developers> 
+
+	<repositories>
+		<repository>
+			<id>Spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>public</id>
+			<name>Public Repositories</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>sonatype-releases</id>
+			<url>http://oss.sonatype.org/content/repositories/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>shibboleth-releases</id>
+			<url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
+		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>public</id>
+			<name>Public Repositories</name>
+			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<commons-lang3.version>3.6</commons-lang3.version>
+		<commons-io.version>2.5</commons-io.version>
+		<commons-logging.version>1.2</commons-logging.version>
+		<commons-text.version>1.1</commons-text.version>
+		<!--docker build、push地址-->
+		<docker.workdir>/u01/boot/${project.artifactId}</docker.workdir>
+	    <docker.push.repostory>Docker Hub IP</docker.push.repostory>
+	    <docker.build.repostory>Docker Local Repostory IP</docker.build.repostory>
+	    <!--push镜像到私有库项目的名称-->
+	    <docker.registry.name>Docker Registry Name</docker.registry.name>
+		<java.version>1.8</java.version>
+		<junit.version>4.12</junit.version>
+		<javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+		<slf4j.version>1.7.25</slf4j.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+	
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons-lang3.version}</version>
+			</dependency>
+			
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons-io.version}</version>
+			</dependency>
+			
+			<dependency>
+			    <groupId>org.apache.commons</groupId>
+			    <artifactId>commons-text</artifactId>
+			    <version>${commons-text.version}</version>
+			</dependency>
+			
+			<!-- Java Servlet API -->
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet-api.version}</version>
+			</dependency>
+			
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- Spring Boot Test 依赖 -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<!-- 编译插件：编译主代码至主输出目录 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<!-- 设置源文件编码方式 -->
+					<configuration>
+						<defaultLibBundleDir>lib</defaultLibBundleDir>
+						<!-- 源代码编译版本 -->
+						<source>1.8</source>
+						<!-- 目标平台编译版本 -->
+						<target>1.8</target>
+						<!-- 字符集编码 -->
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<!-- -->
+						<maxmem>512M</maxmem>
+					</configuration>
+				</plugin>
+				<!-- 资源插件：复制主资源文件至主输出目录 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<!-- 解决资源文件的编码问题 -->
+					<configuration>
+						<!-- 字符集编码 -->
+						<encoding>${project.build.sourceEncoding}</encoding>
+					</configuration>
+					<!-- 复制测试资源文件至测试输出目录复制resources到test-classess -->
+					<executions>
+						<execution>
+							<id>copy-resources</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${basedir}/target/test-classes</outputDirectory>
+								<resources>
+									<resource>
+										<directory>src/main/resources</directory>
+										<!--<filtering>true</filtering> -->
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.shared</groupId>
+							<artifactId>maven-filtering</artifactId>
+							<version>1.3</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+				<!-- 单元测试插件 ：执行测试用例 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<configuration>
+						<!-- 跳过单元测试 -->
+						<skip>true</skip>
+						<skipTests>true</skipTests>
+						<!-- forkMode 可设置值有 “never”， “once”， “always” 和 “pertest”。 pretest： 
+							每一个测试创建一个新进程，为每个测试创建新的JVM是单独测试的最彻底方式，但也是最慢的，不适合hudson上持续回归。 once：在一个进程中进行所有测试。once为默认设置，在Hudson上持续回归时建议使用默认设置。 
+							always：在一个进程中并行的运行脚本，Junit4.7以上版本才可以使用，surefire的版本要在2.6以上提供这个功能，其中 threadCount：执行时，指定可分配的线程数量。只和参数parallel配合使用有效。默认：5。 -->
+						<forkMode>once</forkMode>
+						<argLine>-Xmx1024M -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M</argLine>
+						<additionalClasspathElements>
+							<additionalClasspathElement>
+								${basedir}/target/test-classes
+							</additionalClasspathElement>
+						</additionalClasspathElements>
+						<includes>
+							<include>**/*Test.java</include>
+						</includes>
+						<excludes>
+							<exclude>**/TestBean.java</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+				<!-- jar包生成插件 ：创建项目jar包 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<!-- 打包jar文件时，配置manifest文件，加入lib包的jar依赖 -->
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix>lib/</classpathPrefix>
+							</manifest>
+							<!-- <manifestEntries>
+		                        <SCM-Revision>${svn_revision}</SCM-Revision>
+		                        <Timestamp>${maven.build.timestamp}</Timestamp>
+		                        <Branch>${svn_url}</Branch>
+		                        <Baseline>${baseline}</Baseline>
+		                    </manifestEntries> -->
+						</archive>
+					</configuration>
+		            <executions>
+		                <execution>
+		                    <phase>package</phase>
+		                </execution>
+		            </executions>
+				</plugin>
+				<!-- 安装插件：将项目输出构件安装到本地仓库 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</plugin>
+				<!-- 发布插件 ：将项目输出构件部署到远程仓库 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</plugin>
+				<!-- 源码插件:发布时自动将源码同时发布 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<!-- 打包source文件为jar文件 -->
+					<configuration>
+						<testFailureIgnore>true</testFailureIgnore>
+						<attach>true</attach>
+						<encoding>UTF-8</encoding>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-sources</id>
+							<phase>package</phase>
+							<goals>
+								<goal>jar-no-fork</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<!-- 文档插件:发布时自动生成文档 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<configuration>
+						<aggregate>true</aggregate>
+						<charset>UTF-8</charset>
+						<encoding>UTF-8</encoding>
+						<docencoding>UTF-8</docencoding>
+					</configuration>
+					<executions>
+						<execution>
+							<id>attach-javadocs</id>
+							<phase>package</phase>
+							<goals>
+								<goal>jar</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<!-- 生成可执行的启动脚本： http://www.mojohaus.org/appassembler/appassembler-maven-plugin，http://blog.csdn.net/mn960mn/article/details/51554152 -->
+				<plugin>  
+			        <groupId>org.codehaus.mojo</groupId>  
+			        <artifactId>appassembler-maven-plugin</artifactId>  
+			        <version>2.0.0</version>
+			        <configuration>  
+			            
+			            <!-- 脚本模式、进程模式 通用参数 -->
+			            
+			            <!-- 配置文件的目标目录 -->  
+			            <configurationDirectory>conf</configurationDirectory>
+			            <!-- 从哪里拷贝配置文件 (默认src/main/config) 
+			            <configurationSourceDirectory>${project.build.directory}/antrun/generated-resources</configurationSourceDirectory>-->
+			            <!-- 是否拷贝配置文件到上面的目录中;因为Spring-Boot资源不需要全部拷贝，这里交由antrun插件帮我们部分进行拷贝    -->
+			            <copyConfigurationDirectory>false</copyConfigurationDirectory> 
+		              	
+		              	<!-- 过滤源配置目录时应用的字符编码格式 -->  
+			            <encoding>UTF-8</encoding> 
+			            <!-- 
+			            	$BASEDIR/bin目录中的启动脚本执行前调用的脚本名称，用于设置环境变量，类似Tomcat的setenv。
+							注意：仅适用于jsw平台。如果这个可选的环境文件也设置了WRAPPER_CONF_OVERRIDES变量，它将被传递给JSW本机启动器的命令行参数，
+								以覆盖wrapper.conf的属性。有关详细信息，请参阅http://wrapper.tanukisoftware.com/doc/english/props-command-line.html。
+			             -->  
+			          	<environmentSetupFileName>setenv</environmentSetupFileName>
+			          	<!-- 此字符串前面的表达式将不会被更改。 如 \${foo}将被${foo}替换。 -->
+			          	<escapeString>#</escapeString>
+			          	<!-- 是否源配置目录应该被复制到配置的配置目录中。此配置可以由更通用的preAssembleDirectory选项替换  -->
+			          	<filterConfigurationDirectory>true</filterConfigurationDirectory>
+			          	<!-- 是否源预装配时复制到配置的目录应过滤assembleDirectory。 -->
+			          	<filterPreAssembleDirectory>true</filterPreAssembleDirectory>
+			          	<!-- 是否拷贝Maven依赖jar;因为Spring-Boot已经将依赖的jar打包到最终工程，这里指定不需要拷贝 -->
+			            <generateRepository>false</generateRepository>
+			          	<!-- 您可以定义一个许可证头文件，该文件将替代生成的脚本中的默认头文件。
+			          	<licenseHeaderFile></licenseHeaderFile> -->
+			          	<!-- 项目的日志目录。如果为此参数指定一个值，将创建一个名为给定的空目录 -->
+			            <logsDirectory>logs</logsDirectory>
+			          	<!-- 将库复制到存储库时使用的文件名映射。如果没有设置文件映射（默认），则使用其标准名称复制文件。注意：如果使用此参数，则将 忽略useTimestampInSnapshotFileName参数。 -->
+			          	<!-- <outputFileNameMapping></outputFileNameMapping> -->
+			          	<!-- 如果存在，请将此目录的内容复制到配置的 assembleDirectory，并使用选项进行过滤。此配置可以替代copyConfigurationDirectory 
+		             	<preAssembleDirectory></preAssembleDirectory>-->
+			            <!-- 生成的Maven仓库的布局。支持的类型 - “默认”（Maven2）| “遗产”（Maven1）| “平”（flat lib / style）。
+			            	  只有当您运行在Maven 2.2.1之前，才支持“legacy”样式。 
+			           		说明：
+			           			 如果拷贝Maven依赖jar;则对应的lib目录中jar的存放规则，默认是${groupId}/${artifactId}的目录格式，flat表示直接把jar放到lib目录
+			             -->  
+			            <repositoryLayout>flat</repositoryLayout>
+			           	<!--  打包的jar,以及maven依赖的jar存储的目录（相对于assembleDirectory） -->  
+			            <repositoryName>lib</repositoryName>  
+			            <!-- 项目的临时目录。如果为此参数指定一个值，将创建一个名为给定的空目录。 -->  
+			            <tempDirectory>tmp</tempDirectory>
+			            <!-- 生成的脚本的unix模板。它可以是文件或资源路径。如果没有给出，使用内部的。小心使用，因为它不能保证与新的插件版本兼容。 -->
+			            <unixScriptTemplate></unixScriptTemplate>
+			            <!-- 对于从远程回购下载的快照，请使用“SNAPSHOT”替换时间戳部分。 -->
+			            <useTimestampInSnapshotFileName>false</useTimestampInSnapshotFileName>
+			            <!-- 
+						            有时候，有许多依赖关系意味着有一个非常长的类路径，并且变得太长（特别是在基于Windows的平台上）。这种选择可以帮助这种情况。
+						            如果激活此选项，您的类路径只包含一个类路径通配符（REPO/*）。但请注意，这仅适用于Java 1.6及更高版本,且 repositoryLayout=flat的情况。
+			             -->
+			            <useWildcardClassPath>true</useWildcardClassPath>
+			            <!-- 生成脚本的windows模板。它可以是文件或资源路径。如果没有给出，使用内部的。小心使用，因为它不能保证与新的插件版本兼容。
+			            <windowsScriptTemplate></windowsScriptTemplate> -->
+			            
+			            <!-- 命令模式 : http://www.mojohaus.org/appassembler/appassembler-maven-plugin/assemble-mojo.html -->
+			            
+			            <!-- 生成的执行脚本存放目录；默认${project.build.directory}/appassembler.（必填参数） -->  
+			            <assembleDirectory>${project.build.directory}/generated-resources/appassembler/${project.artifactId}</assembleDirectory>  
+			            <!-- 用于bin文件的文件扩展名。文件扩展名存储在使用平台名称作为键的地图中。要将Unix bin文件的文件扩展名更改为“.sh”，请使用此配置： -->
+			            <binFileExtensions>
+				           <unix>.sh</unix>
+				        </binFileExtensions>
+			            <!-- 可执行脚本的目录 -->  
+			            <binFolder>bin</binFolder>  
+			            <!-- 
+			            	额外的JVM参数。如果在Program.setJvmSettings（） 级别上定义JvmSettings，则该部分将被程序级别的给定参数覆盖。
+			            	否则，如果没有给予Program.setJvmSettings（），将使用这些设置。
+			            	这可以用于定义一些默认值，而通过使用 Program.setJvmSettings（）覆盖默认设置。这仅适用于不是JvmSettings其余部分的extraJvmArguments。
+			            	自从1.2以来，可以使用BASEDIR @和@ REPO @的占位符 ，将根据将生成相应脚本的平台进行扩展。
+			             -->
+			            <extraJvmArguments>-Xms256M -Xmn512M -Xmx512M -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=512M</extraJvmArguments>
+			            <!-- 是否显示控制台 -->
+			            <showConsoleWindow>true</showConsoleWindow>
+			            
+			            <!-- 插件将会为其生成bin文件的默认平台。使用字符串值进行配置 - “全部”（默认/空）| “windows”| “UNIX”。 -->  
+			            <platforms>  
+			                <platform>windows</platform>
+			                <platform>unix</platform>
+			            </platforms> 
+			           <!-- 如果configurationDirectory（默认情况下）应包含在生成的bin文件的类路径的开始。（注意：该配置指定外部配置文件路径，如不配置可能导致无法启动） -->
+			            <includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
+			            <!-- 这可以用于将项目依赖、配置文件夹（等等）放置于类路径的第一个条目。默认行为是放在classpath的最后一个位置。 -->
+			            <projectArtifactFirstInClassPath>false</projectArtifactFirstInClassPath>
+			            <!-- 以下可用于使用所有项目依赖关系，而不是 仅代表运行时依赖关系的默认行为。 -->
+			            <useAllProjectDependencies>false</useAllProjectDependencies>
+			            
+			            <!-- 将生成bin文件的一组程序配置（必填参数） -->
+			            <programs>  
+			                <program>  
+			                    <id>deploy-boot</id>
+			                    <!--指定主类，脚本名。会生成shell/bat两种类型,也可用platforms指定运行平台-->
+			                    <mainClass>org.springframework.boot.loader.JarLauncher</mainClass> 
+			                    <!-- 生成的脚本文件的名称，比如start.sh,你也可以根据你的需要命名成其他名字 -->
+			                    <licenseHeaderFile></licenseHeaderFile> 
+			                    <jvmSettings>  
+			                        <extraArguments> 
+			                        	<!-- 后台服务运行 --> 
+			                           	<extraArgument>-server</extraArgument>
+			                            <!-- 初始内存 --> 
+				                        <extraArgument>-Xms256M</extraArgument>  
+				                        <!-- 最小内存  -->
+				                        <extraArgument>-Xmn512M</extraArgument>  
+				                        <!-- 最大内存 -->
+				                        <extraArgument>-Xmx512M</extraArgument>
+				                        <!-- 元空间 -->
+			                         	<!-- 初始空间大小，达到该值就会触发垃圾收集进行类型卸载，同时GC会对该值进行调整：如果释放了大量的空间，就适当降低该值；如果释放了很少的空间，那么在不超过MaxMetaspaceSize时，适当提高该值。 -->
+			                         	<extraArgument>-XX:MetaspaceSize=256M</extraArgument>
+			                         	<!-- 最大空间，默认是没有限制的 -->
+			                         	<extraArgument>-XX:MaxMetaspaceSize=512M</extraArgument>
+			                         	<!-- 在GC之后，最小的Metaspace剩余空间容量的百分比，减少为分配空间所导致的垃圾收集
+			                         	<extraArgument>-XX:MinMetaspaceFreeRatio=60</extraArgument> -->
+			                         	<!-- 在GC之后，最大的Metaspace剩余空间容量的百分比，减少为释放空间所导致的垃圾收集 
+			                         	<extraArgument>-XX:MaxMetaspaceFreeRatio=60</extraArgument>-->
+			                        </extraArguments>
+			                    </jvmSettings>  
+			                </program>  
+			            </programs>
+			            
+		             	<!-- 后台服务模式  : http://www.mojohaus.org/appassembler/appassembler-maven-plugin/generate-daemons-mojo.html-->
+						
+			            <!-- 项目的基本目录,默认值为：${basedir}。 -->
+			            <basedir>${project.artifactId}</basedir>
+			            <!-- 可执行脚本的名称 -->
+			            <binFileName>deploy-boot</binFileName>
+			            <!-- 生成的守护程序的目标目录。默认值为：${project.build.directory}/generated-resources/appassembler。 -->
+			            <target>${project.build.directory}/generated-resources/appassembler</target>
+						<!-- JvmSettings描述最小/最大内存和堆栈大小，系统属性和额外的参数。 -->
+			            <defaultJvmSettings>
+			            	<!-- 初始内存 -->
+			            	<initialMemorySize>256M</initialMemorySize>
+			            	<!-- 最大内存 -->
+	                        <maxMemorySize>512M</maxMemorySize>
+	                        <maxStackSize>512M</maxStackSize>
+			            </defaultJvmSettings>
+						<!-- 使用此选项覆盖当前内置的增量包二进制文件。您将需要将增量包版本解压缩到由此选项设置的已知位置。 
+						<externalDeltaPackDirectory></externalDeltaPackDirectory>-->
+		             	<!-- 使用此选项将已知文件的内容预插入到生成的包装器配置文件中。例如：$ include ../conf/another-wrapper.conf User属性是：preWrapperConf。
+		             	<preWrapperConf></preWrapperConf> -->
+		             	<!-- 启用时，名称包装器配置文件为wrapper - $ {daemon.id} .conf  -->
+		             	<useDaemonIdAsWrapperConfName>false</useDaemonIdAsWrapperConfName>
+		             	<!-- 启用时，将包装器可执行文件前缀为$ {daemon.id}。否则，使用原始名称（即包装） -->
+		             	<useDaemonIdAsWrapperExePrefixName>false</useDaemonIdAsWrapperExePrefixName>
+		             	
+		             	<!-- 一套守护进程生成配置（必填参数） -->
+			            <daemons>  
+				            <daemon> 
+				            	<!-- 唯一ID，会影响生成的目录名 -->
+				                <id>${project.artifactId}</id>
+				                <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>  
+				                <platforms>
+				                    <platform>jsw</platform>  
+				                </platforms> 
+				                <generatorConfigurations>  
+				                    <generatorConfiguration>  
+				                        <generator>jsw</generator>
+				                        <includes>  
+				                            <include>linux-x86-32</include>
+				                            <include>linux-x86-64</include>
+				                            <include>windows-x86-32</include>
+				                            <include>windows-x86-64</include>
+				                        </includes>  
+				                        <configuration>  
+				                            <property>  
+				                                <name>configuration.directory.in.classpath.first</name>  
+				                                <value>conf</value>  
+				                            </property>  
+				                            <property>  
+				                                <name>wrapper.ping.timeout</name>  
+				                                <value>120</value>  
+				                            </property>  
+				                            <property>  
+				                                <name>set.default.REPO_DIR</name>  
+				                                <value>lib</value> 
+				                            </property>  
+				                            <property>  
+				                                <name>wrapper.logfile</name>  
+				                                <value>logs/wrapper.log</value>  
+				                            </property>  
+				                        </configuration>  
+				                    </generatorConfiguration>  
+				                </generatorConfigurations>
+				                <environmentSetupFileName></environmentSetupFileName>  
+				                <jvmSettings>
+	                                <extraArguments>  
+	                                    <!-- 初始内存 --> 
+			                         	<extraArgument>-Xmn256M</extraArgument>  
+			                         	<!-- 最小内存  -->
+			                         	<extraArgument>-Xmn512M</extraArgument>  
+			                         	<!-- 最大内存 -->
+			                         	<extraArgument>-Xmx512M</extraArgument>
+			                         	<!-- 元空间 -->
+			                         	<!-- 初始空间大小，达到该值就会触发垃圾收集进行类型卸载，同时GC会对该值进行调整：如果释放了大量的空间，就适当降低该值；如果释放了很少的空间，那么在不超过MaxMetaspaceSize时，适当提高该值。 -->
+			                         	<extraArgument>-XX:MetaspaceSize=256M</extraArgument>
+			                         	<!-- 最大空间，默认是没有限制的 -->
+			                         	<extraArgument>-XX:MaxMetaspaceSize=512M</extraArgument>
+			                         	<!-- 在GC之后，最小的Metaspace剩余空间容量的百分比，减少为分配空间所导致的垃圾收集
+			                         	<extraArgument>-XX:MinMetaspaceFreeRatio=60</extraArgument> -->
+			                         	<!-- 在GC之后，最大的Metaspace剩余空间容量的百分比，减少为释放空间所导致的垃圾收集 
+			                         	<extraArgument>-XX:MaxMetaspaceFreeRatio=60</extraArgument>-->
+	                                </extraArguments>
+				                    <systemProperties>  
+				                    	<systemProperty>java.security.policy=conf/policy.all</systemProperty>
+				                        <systemProperty>com.sun.management.jmxremote</systemProperty>  
+				                        <systemProperty>com.sun.management.jmxremote.port=1984</systemProperty>  
+				                        <systemProperty>com.sun.management.jmxremote.authenticate=false</systemProperty>  
+				                        <systemProperty>com.sun.management.jmxremote.ssl=false</systemProperty>  
+				                    </systemProperties>  
+				                </jvmSettings>  
+				            </daemon>
+			            </daemons>
+			            
+			        </configuration>  
+			    </plugin>
+			    <!-- ant脚步执行插件 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<phase>package</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<target>
+									<echo message="remove resources" />
+									
+									<!-- 处理脚本模式依赖资源 -->
+									<!-- 拷贝Jar文件 -->
+									<copy file="${project.build.directory}/${project.build.finalName}.jar" 
+										todir="${project.build.directory}/generated-resources/appassembler/${project.artifactId}/lib"/>
+									<!-- 拷贝配置文件文件 -->
+									<copy file="${basedir}/src/main/resources/application.properties" 
+										todir="${project.build.directory}/generated-resources/appassembler/${project.artifactId}/conf"/>
+									<copy file="${basedir}/src/main/resources/application.yml" 
+										todir="${project.build.directory}/generated-resources/appassembler/${project.artifactId}/conf"/>
+									
+									<!-- 处理服务模式依赖资源 -->
+									<!-- 拷贝Jar文件 -->
+									<copy file="${project.build.directory}/${project.build.finalName}.jar" 
+										todir="${project.build.directory}/generated-resources/appassembler/jsw/${project.artifactId}/lib"/>
+									<!-- 拷贝配置文件文件 -->
+									<copy file="${basedir}/src/main/resources/application.properties" 
+										todir="${project.build.directory}/generated-resources/appassembler/jsw/${project.artifactId}/conf"/>
+									<copy file="${basedir}/src/main/resources/application.yml" 
+										todir="${project.build.directory}/generated-resources/appassembler/jsw/${project.artifactId}/conf"/>
+									
+								</target>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			    <!-- docker-maven插件: https://github.com/spotify/docker-maven-plugin,http://blog.csdn.net/qq_22841811/article/details/67369530 -->
+				<plugin>
+					<groupId>com.spotify</groupId>
+					<artifactId>docker-maven-plugin</artifactId>
+					<version>0.4.13</version>
+					<executions>
+						<execution>
+							<id>build-image</id>
+							<phase>package</phase>
+							<goals>
+								<goal>build</goal>
+							</goals>
+						</execution>
+						<execution> 
+							<id>tag-image</id> 
+							<phase>package</phase> 
+							<goals> 
+								<goal>tag</goal> 
+							</goals> 
+							<configuration> 
+								<image>${project.artifactId}:${project.version}</image> 
+								<newName>${docker.push.repostory}/${docker.registry.name}/${project.artifactId}:${project.version}</newName> 
+							</configuration> 
+						</execution>
+						<execution>
+							<id>push-image</id>
+							<phase>deploy</phase>
+							<goals>
+								<goal>push</goal>
+							</goals>
+							<configuration> 
+								<imageName>${docker.push.repostory}/${docker.registry.name}/${project.artifactId}:${project.version}</imageName> 
+							</configuration>
+						</execution>
+					</executions>
+					<configuration>
+						<!-- 注意imageName一定要是符合正则[a-z0-9-_.]的，否则构建不会成功 -->
+						<!-- 详见：https://github.com/spotify/docker-maven-plugin Invalid repository 
+							name ... only [a-z0-9-_.] are allowed -->
+						<!-- 如果要将docker镜像push到DockerHub上去的话，这边的路径要和repo路径一致 -->
+						<imageName>${project.artifactId}:${project.version}</imageName>
+						<!-- 指定Dockerfile所在的路径 -->
+						<!-- <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>  -->
+						<baseImage>${docker.push.repostory}/${docker.registry.name}/openjdk:1.8</baseImage>
+						<workdir>${docker.workdir}</workdir>
+						<entryPoint>["sh","./bin/deploy-boot.sh"]</entryPoint>
+						<dockerHost>http://${docker.build.repostory}:2376</dockerHost>
+						<resources>
+							<resource>
+								<targetPath>${docker.workdir}</targetPath>
+								<directory>${project.build.directory}/generated-resources/appassembler/${project.artifactId}</directory>
+							</resource>
+						</resources>
+						<!-- 以下两行是为了docker push到DockerHub使用的。 -->
+						<serverId>docker-hub</serverId>
+						<!-- <registryUrl>http://10.71.33.155/</registryUrl> -->
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<!-- 资源插件：复制主资源文件至主输出目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+			</plugin>
+			<!-- 编译插件：编译主代码至主输出目录 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<!-- 单元测试插件 ：执行测试用例 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<!-- jar包生成插件 ：创建项目jar包 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<!-- 安装插件：将项目输出构件安装到本地仓库 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+			</plugin>
+			<!-- 发布插件 ：将项目输出构件部署到远程仓库 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+			</plugin>
+			<!-- 源码插件:发布时自动将源码同时发布 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+	<modules>
+		<module>spring-boot-deployment-app</module>
+		<module>spring-boot-deployment-docker</module>
+	</modules>
+</project>

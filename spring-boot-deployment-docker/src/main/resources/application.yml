@@ -1,0 +1,23 @@
+server:
+  port: 8081
+management: 
+  port: 54001
+  health:
+    mail:
+      enabled: false
+info: 
+  app:
+    name: "@project.name@" #从pom.xml中获取
+    description: "@project.description@"
+    version: "@project.version@"
+    spring-boot-version: "@project.parent.version@"
+
+spring: 
+  #MVC
+  mvc:
+    static-path-pattern: /**
+    view:
+      prefix: classpath:/templates/
+  resources:
+    static-locations:
+    - classpath:/templates/
